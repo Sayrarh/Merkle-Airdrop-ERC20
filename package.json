@@ -1,0 +1,23 @@
+{
+  "name": "merkle-airdrop",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^2.0.0",
+    "hardhat": "^2.11.2"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.7.3",
+    "csv-parser": "^3.0.0",
+    "fs": "^0.0.1-security",
+    "keccak256": "^1.0.6",
+    "merkletreejs": "^0.2.32",
+    "web3": "^1.8.0"
+  }
+}
