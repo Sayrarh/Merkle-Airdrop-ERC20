@@ -1,9 +1,17 @@
 const { ethers } = require("hardhat");
 const helpers = require("@nomicfoundation/hardhat-network-helpers");
 const hre = require("hardhat");
+//import data from "../gen_files/merkleproof.json";
+const data  = require("../gen_files/merkleproof.json")
+const userDetails =  require("../gen_files/claimlist.json");
 
-// helpers
-async function main() {
+    // helpers
+    async function main() {
+    const claimer = Object.keys(data)[4];
+    console.log(claimer)
+    const proof = data[claimer].proof
+    const amount = userDetails[claimer].amount
+
 
     const Ramney = await ethers.getContractFactory("Ramney");
     const ramney = await Ramney.deploy();
@@ -15,34 +23,33 @@ async function main() {
     await  merkle.deployed();
     console.log("Contract address is:", merkle.address);
 
-    const addr2 = "0x9a3a60f5aee7aef1fb0d4da8534452a2e2a89d46";
-
-    const proof = [
-      "0xa585e30aaeb5ead2e9104606807a9601249e97b8d12f53b0db33c380d8232692",
-      "0xf72370848fc5c87649f87e83c31248cd1d1dde11878aa823a94b52c34d67bdb7",
-      "0x22bab27f5682135792ad43281e384a991567dbf75ba228e29bf2ff9dec08ffc5",
-      "0xba76c39476a5d594b85a1f06b1b882175764bc1249357adc063e4b48ba097a7e"
-        ]
 
     await hre.network.provider.request({
           method: "hardhat_impersonateAccount",
-          params: [addr2]
+          params: [claimer]
         });
-    const addrSigner = await ethers.getSigner(addr2);
-    console.log(addrSigner);
+    const addrSigner = await ethers.getSigner(claimer);
+    //console.log(addrSigner);
 
+    //set balance for the signer to be able to pay for gas
     await helpers.setBalance(addrSigner.address, 100n ** 18n)
 
 
     const interact = await ethers.getContractAt("Merkle",merkle.address );
     const tokenInteract = await ethers.getContractAt("Ramney", ramney.address);
-    const amt = ethers.utils.parseUnits("10");
+
+
+    const transfer = await tokenInteract.transferOut(merkle.address, 20000)
+    console.log("transfer: ",  transfer);
+
+    const bal = await tokenInteract.balanceOf(merkle.address)
+    console.log("balance of address: ", bal)
    
-    const claim = await interact.connect(addrSigner).claimToken(proof, amt);
-    console.log(claim);
+    const claim = await interact.connect(addrSigner).claimToken(proof, amount);
+    console.log("claiming: ", claim);
 
     const balance =  await tokenInteract.balanceOf(addrSigner.address);
-    console.log("balance of signer:", balance );
+    console.log("balance of signer:",  balance );
 
 }
 

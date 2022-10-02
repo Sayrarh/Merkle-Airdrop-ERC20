@@ -19,7 +19,7 @@ contract Merkle{
         require(!claimed[msg.sender], "Already Claimed");
          bytes32 leaf = keccak256(abi.encodePacked(msg.sender, _amount));
         if(!MerkleProof.verify(_merkleProof, merkleRoot, leaf)) {
-            return false;
+            revert("not whitelisted");
         }
 
         claimed[msg.sender] = true;
